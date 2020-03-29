@@ -13,7 +13,11 @@
 from abc import ABC, abstractmethod
 
 
-class WordItem(ABC):
+class WordEntry(ABC):
+    """
+    单词词条
+    """
+
     @property
     def word(self):
         """
@@ -38,6 +42,7 @@ class WordItem(ABC):
     def __init__(self, word, cn_paraphrase, en_paraphrase):
         """
         Args:
+
             :param word: str, 单词
             :param cn_paraphrase: str, 中文解释
             :param en_paraphrase: str, 英文解释
@@ -48,10 +53,36 @@ class WordItem(ABC):
 
 
 class WordRecord(ABC):
+    """
+    一个单词在词典中的记录, 包含若干词条
+    """
+
+    @property
+    def word(self):
+        """
+        :return: str, 被描述的单词
+        """
+        return self._word
 
     @classmethod
-    def create(cls):
-        return cls()
+    def create(cls, word):
+        return cls(word)
+
+    def __init__(self, word):
+        self._items = []
+        self._word = word
+
+    def add_entry(self, word_entry):
+        """
+        新增单词词条
+        :param word_entry: WordEntry, 需要新增的词条
+        :return: None
+        """
+
+        if isinstance(word_entry, WordEntry):
+            self._items.append(word_entry)
+        else:
+            raise ValueError('Only inst of WordEntry can be added but {}'.format(type(word_entry)))
 
 
 class BaseDict(ABC):
@@ -66,7 +97,7 @@ class BaseDict(ABC):
         pass
 
     @abstractmethod
-    def word_2_record(self, word):
+    def refer_to_word(self, word):
         """
         :param word: str, 需要查询的单词
         :return: WordRecord, word对应的单词记录
